@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aero Inventory Monitoring System - Feature Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+  .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 40px 0; text-align: center; }
+  .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+  .header p { color: #94a3b8; font-size: 0.95rem; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin: -30px auto 30px; position: relative; z-index: 1; }
+  .stat-card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .stat-card .num { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
+  .stat-card .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+  /* Role Tabs */
+  .role-tabs { display: flex; gap: 4px; background: #e2e8f0; border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+  .role-tab { flex: 1; padding: 10px 16px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s; }
+  .role-tab.active { background: white; color: #0f172a; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .role-tab:hover:not(.active) { color: #334155; }
+  .role-content { display: none; }
+  .role-content.active { display: block; }
+
+  /* Section */
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title .icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+
+  /* Feature Cards */
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .feature-card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; transition: box-shadow 0.2s; }
+  .feature-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .feature-card h3 { font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+  .feature-card .path { font-size: 0.7rem; font-family: monospace; color: #94a3b8; margin-bottom: 8px; }
+  .feature-card p { font-size: 0.85rem; color: #475569; margin-bottom: 10px; }
+  .feature-card .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .tag-blue { background: #dbeafe; color: #1e40af; }
+  .tag-green { background: #dcfce7; color: #166534; }
+  .tag-amber { background: #fef3c7; color: #92400e; }
+  .tag-purple { background: #f3e8ff; color: #6b21a8; }
+  .tag-red { background: #fee2e2; color: #991b1b; }
+  .tag-gray { background: #f1f5f9; color: #475569; }
+
+  /* Sub-features list */
+  .sub-features { list-style: none; margin: 8px 0 0; padding: 0; }
+  .sub-features li { font-size: 0.8rem; color: #64748b; padding: 3px 0; padding-left: 16px; position: relative; }
+  .sub-features li::before { content: ""; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; }
+
+  /* Tabs within features */
+  .inner-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+  .inner-tab { font-size: 0.7rem; padding: 3px 10px; border-radius: 6px; background: #f1f5f9; color: #64748b; font-weight: 500; }
+
+  /* Phase badges */
+  .phase-badge { display: inline-block; font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-left: 8px; }
+  .phase-1 { background: #dbeafe; color: #1e40af; }
+  .phase-2 { background: #dcfce7; color: #166534; }
+  .phase-3 { background: #fef3c7; color: #92400e; }
+  .phase-4 { background: #f3e8ff; color: #6b21a8; }
+  .phase-5 { background: #fee2e2; color: #991b1b; }
+  .phase-6 { background: #fce7f3; color: #9d174d; }
+
+  .divider { height: 1px; background: #e2e8f0; margin: 32px 0; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 40px 0; color: #94a3b8; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container">
+    <h1>Aero Inventory Monitoring System</h1>
+    <p>Complete Feature Guide &mdash; Aeropostale Philippines</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat-card"><div class="num">29</div><div class="label">Epics</div></div>
+    <div class="stat-card"><div class="num">87</div><div class="label">Stories</div></div>
+    <div class="stat-card"><div class="num">6</div><div class="label">Phases</div></div>
+    <div class="stat-card"><div class="num">3</div><div class="label">User Roles</div></div>
+    <div class="stat-card"><div class="num">40+</div><div class="label">Pages</div></div>
+  </div>
+
+  <!-- Role Tabs -->
+  <div class="role-tabs">
+    <button class="role-tab active" onclick="showRole('admin')">Admin</button>
+    <button class="role-tab" onclick="showRole('manager')">Branch Manager</button>
+    <button class="role-tab" onclick="showRole('staff')">Branch Staff</button>
+    <button class="role-tab" onclick="showRole('system')">System / Automation</button>
+  </div>
+
+  <!-- ==================== ADMIN ==================== -->
+  <div id="role-admin" class="role-content active">
+
+    <!-- Overview -->
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#dbeafe;color:#1e40af">&#128202;</span> Overview</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Network Dashboard</h3>
+          <div class="path">/dashboard</div>
+          <p>At-a-glance view of the entire network's health with real-time KPIs.</p>
+          <ul class="sub-features">
+            <li>Summary cards: Total Products, SOH Value, Network Sell-Thru %, Slow Movers</li>
+            <li>Classification donut chart (Fast / Mid / Slow breakdown)</li>
+            <li>Upcoming trading events widget</li>
+            <li>Recent activity feed (last 10 actions)</li>
+            <li>Full sell-thru dashboard with branch health cards</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Dashboard</span><span class="tag tag-green">Real-time</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Sell-Thru</h3>
+          <div class="path">/sell-thru</div>
+          <p>Comprehensive sell-through monitoring with search, filters, and multiple views.</p>
+          <div class="inner-tabs">
+            <span class="inner-tab">Live Dashboard</span>
+            <span class="inner-tab">Branch Summary</span>
+            <span class="inner-tab">Network Summary</span>
+            <span class="inner-tab">Search</span>
+          </div>
+          <ul class="sub-features">
+            <li>Product search by name or style code</li>
+            <li>Overall view: aggregated sell-thru across all branches</li>
+            <li>Per-branch view: toggle between branches</li>
+            <li>Columns: Image, BEG, Sold, SOH, Sell-Thru %, Classification, WH Arrived, Branch Arrived</li>
+            <li>Excel &amp; PDF export on summary views</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Search</span><span class="tag tag-green">Export</span><span class="tag tag-amber">Filters</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Stock Overview</h3>
+          <div class="path">/stock-overview</div>
+          <p>Network-wide inventory levels with filtering and export capabilities.</p>
+          <ul class="sub-features">
+            <li>Filter by department, category, collection, branch</li>
+            <li>SOH, beginning stock, sell-thru for each product</li>
+            <li>Export to Excel &amp; PDF</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Inventory</span><span class="tag tag-green">Export</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Branches</h3>
+          <div class="path">/branches</div>
+          <p>Create and manage retail branch locations and the central warehouse.</p>
+          <ul class="sub-features">
+            <li>Create Branch form (name, code, address, phone, type)</li>
+            <li>View branch details with assigned products</li>
+            <li>Assign products to branches with beginning stock</li>
+            <li>Active/Inactive status toggle</li>
+          </ul>
+          <div class="tags"><span class="tag tag-gray">CRUD</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Products</h3>
+          <div class="path">/products</div>
+          <p>Full product catalog with image upload, pricing, and classification details.</p>
+          <ul class="sub-features">
+            <li>Add Product form with image upload (drag &amp; drop)</li>
+            <li>Grouped sections: Pricing, Classification, Details</li>
+            <li>Fields: Style Code, SRP, Cost, Department, Category, Collection, Color, Fabric</li>
+            <li>Product detail page with edit capability</li>
+            <li>Search and filter by department, category</li>
+          </ul>
+          <div class="tags"><span class="tag tag-gray">CRUD</span><span class="tag tag-purple">Image Upload</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Users</h3>
+          <div class="path">/users</div>
+          <p>Manage user accounts with role assignments and branch access.</p>
+          <ul class="sub-features">
+            <li>Create/Edit user with role selection (Admin, Branch Manager, Branch Staff)</li>
+            <li>Assign users to branches</li>
+            <li>Activate/Deactivate accounts</li>
+          </ul>
+          <div class="tags"><span class="tag tag-gray">CRUD</span><span class="tag tag-red">Access Control</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operations -->
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#dcfce7;color:#166534">&#127981;</span> Operations</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Warehouse</h3>
+          <div class="path">/warehouse</div>
+          <p>Central warehouse management for inbound stock and branch allocation.</p>
+          <ul class="sub-features">
+            <li>Record Inbound Stock: select product, enter quantity</li>
+            <li>Allocate to Branch: select product, destination branch, quantity with SOH validation</li>
+            <li>Warehouse inventory table with current stock levels</li>
+          </ul>
+          <div class="tags"><span class="tag tag-green">Inbound</span><span class="tag tag-blue">Allocation</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Transfers</h3>
+          <div class="path">/transfers</div>
+          <p>Review and approve inter-branch stock transfer requests.</p>
+          <ul class="sub-features">
+            <li>Filter by status (Pending, Approved, Rejected, Completed)</li>
+            <li>Approve/Reject transfers with one click</li>
+            <li>View transfer details: from branch, to branch, products, quantities</li>
+            <li>Pending count badge</li>
+          </ul>
+          <div class="tags"><span class="tag tag-amber">Approval</span><span class="tag tag-blue">Workflow</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Allocation</h3>
+          <div class="path">/allocation</div>
+          <p>Smart allocation engine recommends optimal stock distribution across branches.</p>
+          <ul class="sub-features">
+            <li>Allocation Wizard: step-by-step guided distribution</li>
+            <li>Data-driven recommendations based on sell-thru history</li>
+            <li>Allocation History page at /allocation/history</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">AI-Assisted</span><span class="phase-badge phase-3">Phase 3</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Trading Calendar</h3>
+          <div class="path">/trading-calendar</div>
+          <p>Plan seasonal events, promotions, and markdowns with automated reminders.</p>
+          <div class="inner-tabs">
+            <span class="inner-tab">Table View</span>
+            <span class="inner-tab">Calendar View</span>
+          </div>
+          <ul class="sub-features">
+            <li>Create events with type (Markdown, Promotion, Collection Launch, etc.)</li>
+            <li>Set action triggers and reminder dates</li>
+            <li>Link products to events</li>
+            <li>Calendar grid visualization with event cards</li>
+          </ul>
+          <div class="tags"><span class="tag tag-amber">Planning</span><span class="phase-badge phase-3">Phase 3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#fef3c7;color:#92400e">&#128200;</span> Analytics</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Trends</h3>
+          <div class="path">/trends</div>
+          <p>Sell-thru trend visualization with trajectory indicators and category comparisons.</p>
+          <ul class="sub-features">
+            <li>Sell-thru trend chart over configurable time periods</li>
+            <li>Category comparison chart</li>
+            <li>Trajectory indicators (improving / declining / stable)</li>
+            <li>Declining products table</li>
+            <li>Filter by period, department, category, collection</li>
+          </ul>
+          <div class="tags"><span class="tag tag-amber">Charts</span><span class="phase-badge phase-3">Phase 3</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Forecasts</h3>
+          <div class="path">/forecasts</div>
+          <p>Statistical demand forecasts predicting sell-thru for the next 1-4 weeks.</p>
+          <ul class="sub-features">
+            <li>Per-product forecast cards with week 1-4 predictions</li>
+            <li>Confidence levels (High / Medium / Low)</li>
+            <li>Network-level vs branch-level toggle</li>
+            <li>Forecast Accuracy page at /forecasts/accuracy</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">Prediction</span><span class="phase-badge phase-4">Phase 4</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>ML Forecasts</h3>
+          <div class="path">/ml-forecasts</div>
+          <p>AI/ML-powered demand forecasting with A/B comparison against statistical models.</p>
+          <div class="inner-tabs">
+            <span class="inner-tab">A/B Comparison</span>
+            <span class="inner-tab">ML Only</span>
+            <span class="inner-tab">Statistical Only</span>
+          </div>
+          <ul class="sub-features">
+            <li>Side-by-side ML vs Statistical forecast comparison</li>
+            <li>ML confidence score (0-100%)</li>
+            <li>Model version badge with accuracy</li>
+            <li>Generate Forecasts button</li>
+            <li>Links to A/B Accuracy and Training pages</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">AI/ML</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>ML Training</h3>
+          <div class="path">/ml-forecasts/training</div>
+          <p>Train and manage ML forecasting models with accuracy tracking.</p>
+          <ul class="sub-features">
+            <li>Train New Model button (one-click training)</li>
+            <li>Model version history with status, accuracy, features used</li>
+            <li>Automatic weekly training via cron (Sunday 2 AM)</li>
+            <li>Training data range and feature set display</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">AI/ML</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>A/B Accuracy</h3>
+          <div class="path">/ml-forecasts/accuracy</div>
+          <p>Compare ML vs Statistical forecast accuracy over time with per-product breakdown.</p>
+          <ul class="sub-features">
+            <li>Overall accuracy cards: Statistical %, ML %, Winner, Improvement</li>
+            <li>Per-product accuracy comparison table</li>
+            <li>Winner badges per product (ML / Statistical / Tie)</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">Comparison</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Benchmarks</h3>
+          <div class="path">/benchmarks</div>
+          <p>Compare branch performance with rankings and category-level drill-down.</p>
+          <ul class="sub-features">
+            <li>Branch rankings by sell-thru velocity</li>
+            <li>Network average card</li>
+            <li>Delta vs average (color-coded +/-)</li>
+            <li>Category Breakdown section with branch selector</li>
+            <li>Improvement opportunities flagged (>10% below average)</li>
+            <li>Export to Excel &amp; PDF</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Rankings</span><span class="tag tag-green">Export</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>P&amp;L</h3>
+          <div class="path">/pnl</div>
+          <p>Network-wide profit &amp; loss with margin erosion tracking.</p>
+          <ul class="sub-features">
+            <li>Revenue, cost, margin dashboard</li>
+            <li>Margin erosion table (products with price drops)</li>
+            <li>Branch-level P&amp;L drill-down</li>
+          </ul>
+          <div class="tags"><span class="tag tag-green">Financial</span><span class="phase-badge phase-3">Phase 3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supply Chain -->
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#f3e8ff;color:#6b21a8">&#128666;</span> Supply Chain</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Suppliers</h3>
+          <div class="path">/suppliers</div>
+          <p>Supplier directory with performance scorecards and delivery tracking.</p>
+          <ul class="sub-features">
+            <li>Add/Edit/Delete suppliers with contact info and lead time</li>
+            <li>Supplier detail page with scorecard (on-time rate, variance, quality, composite score)</li>
+            <li>Record individual deliveries</li>
+            <li>CSV bulk import for delivery history</li>
+            <li>Supplier ranking by composite performance score</li>
+          </ul>
+          <div class="tags"><span class="tag tag-gray">CRUD</span><span class="tag tag-blue">Scorecard</span><span class="phase-badge phase-4">Phase 4</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Purchase Orders</h3>
+          <div class="path">/purchase-orders</div>
+          <p>Full PO lifecycle management with auto-generation from reorder rules.</p>
+          <ul class="sub-features">
+            <li>PO status workflow: Draft &rarr; Sent &rarr; Acknowledged &rarr; Shipped &rarr; Received &rarr; Closed</li>
+            <li>Filter by status</li>
+            <li>Advance status / Cancel buttons</li>
+            <li>Auto-generated POs flagged with "auto" badge</li>
+            <li>Total value and active count cards</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Workflow</span><span class="tag tag-purple">Auto-generated</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Markdown Proposals</h3>
+          <div class="path">/markdown-proposals</div>
+          <p>Review and approve automated markdown recommendations with margin preview.</p>
+          <div class="inner-tabs">
+            <span class="inner-tab">Pending</span>
+            <span class="inner-tab">History</span>
+          </div>
+          <ul class="sub-features">
+            <li>Current price vs proposed price with markdown %</li>
+            <li>Current margin % vs post-markdown margin %</li>
+            <li>One-click approve or reject with reason</li>
+            <li>Approved markdowns update prices atomically across all branches</li>
+          </ul>
+          <div class="tags"><span class="tag tag-amber">Approval</span><span class="phase-badge phase-4">Phase 4</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Automation -->
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#fee2e2;color:#991b1b">&#129302;</span> Automation</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Autonomous Engine</h3>
+          <div class="path">/autonomous</div>
+          <p>System autonomously handles routine operations with Admin oversight for exceptions.</p>
+          <div class="inner-tabs">
+            <span class="inner-tab">Exception Queue</span>
+            <span class="inner-tab">All Actions</span>
+          </div>
+          <ul class="sub-features">
+            <li>Auto-executed, Flagged, Approved, Rejected, Undone status tracking</li>
+            <li>Exception queue: approve/reject flagged actions</li>
+            <li>Undo auto-executed actions within 24 hours</li>
+            <li>Daily digest notification summarizing autonomous actions</li>
+            <li>Guardrail check details shown per action</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">AI-Powered</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Guardrails</h3>
+          <div class="path">/autonomous/settings</div>
+          <p>Configure limits for each autonomous action type.</p>
+          <ul class="sub-features">
+            <li>Per-type cards: Markdown, Replenishment, Allocation</li>
+            <li>Max markdown %, max allocation qty, max replenishment qty</li>
+            <li>Forecast variance tolerance</li>
+            <li>Enable/disable per type or globally</li>
+          </ul>
+          <div class="tags"><span class="tag tag-red">Safety</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>POS Status</h3>
+          <div class="path">/pos-status</div>
+          <p>Monitor POS integration health with per-branch sync metrics.</p>
+          <ul class="sub-features">
+            <li>Connected branches, total synced, errors, success rate cards</li>
+            <li>Per-branch cards with last sync, success rate, error count</li>
+            <li>Expandable recent errors table</li>
+            <li>"Manual Entry Only" badge for non-POS branches</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Integration</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customers -->
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#fce7f3;color:#9d174d">&#10084;</span> Customers</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Loyalty Program</h3>
+          <div class="path">/loyalty</div>
+          <p>Customer loyalty analytics with member directory and tier breakdown.</p>
+          <ul class="sub-features">
+            <li>Total members, active rate, total spend, avg spend per member</li>
+            <li>Tier breakdown: Bronze, Silver, Gold, Platinum</li>
+            <li>Member table with preferred categories and visit frequency</li>
+            <li>Loyalty API configuration in Settings</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">CRM</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Customer Feedback</h3>
+          <div class="path">/feedback</div>
+          <p>Feedback themes correlated with sell-thru performance for product insights.</p>
+          <ul class="sub-features">
+            <li>Sentiment analysis: positive / neutral / negative</li>
+            <li>Theme extraction: sizing, quality, design, price, availability, service</li>
+            <li>Products with negative feedback highlighted</li>
+            <li>Public QR code feedback form (no login required)</li>
+            <li>Admin manual feedback entry</li>
+          </ul>
+          <div class="tags"><span class="tag tag-amber">Sentiment</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#f1f5f9;color:#475569">&#9881;</span> Settings (11 pages)</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>All Settings</h3>
+          <p>Configuration pages for every aspect of the system.</p>
+          <ul class="sub-features">
+            <li><strong>Thresholds</strong> &mdash; Fast/Slow classification thresholds by time period</li>
+            <li><strong>Alert Rules</strong> &mdash; Slow mover alert triggers and notification config</li>
+            <li><strong>Aging Policies</strong> &mdash; Aging brackets with recommended actions</li>
+            <li><strong>Replenishment Rules</strong> &mdash; SOH thresholds for restock suggestions</li>
+            <li><strong>Markdown Rules</strong> &mdash; Auto-markdown by classification + weeks on floor</li>
+            <li><strong>Reorder Rules</strong> &mdash; Safety stock + min order qty per product/supplier</li>
+            <li><strong>Weather Config</strong> &mdash; Weather locations mapped to branch regions</li>
+            <li><strong>POS Config</strong> &mdash; Per-branch POS webhook secret and enable/disable</li>
+            <li><strong>Feedback Themes</strong> &mdash; Keyword-based theme extraction config</li>
+            <li><strong>Loyalty API</strong> &mdash; External loyalty platform connection settings</li>
+            <li><strong>Regions</strong> &mdash; Multi-country, multi-currency region management</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#dbeafe;color:#1e40af">&#128196;</span> Reports</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Reports</h3>
+          <div class="path">/reports</div>
+          <p>Detailed sell-thru summary reports with export to Excel and PDF.</p>
+          <ul class="sub-features">
+            <li>Sell-thru summary matching the original Excel format</li>
+            <li>Network-level cross-branch reporting</li>
+            <li>Aging summary report</li>
+            <li>Export to Excel (.xlsx) and PDF with classification colors</li>
+          </ul>
+          <div class="tags"><span class="tag tag-green">Export</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BRANCH MANAGER ==================== -->
+  <div id="role-manager" class="role-content">
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#dbeafe;color:#1e40af">&#127978;</span> Branch Manager Pages</div>
+      <p style="color:#64748b;font-size:0.85rem;margin-bottom:16px;">Branch Managers see only their assigned branch data. Navigation uses horizontal tabs at the top.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Sell-Thru Dashboard</h3>
+          <div class="path">/manager/dashboard</div>
+          <p>Monitor your branch's sell-through performance with KPI cards and product classification.</p>
+          <ul class="sub-features">
+            <li>Fast / Mid / Slow KPI summary cards (clickable to filter)</li>
+            <li>Sell-thru table with sorting by any column</li>
+            <li>Filter by department, category, collection, time period</li>
+            <li>Classification badges with color coding</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Dashboard</span><span class="tag tag-green">Real-time</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Stock Overview</h3>
+          <div class="path">/manager/stock-overview</div>
+          <p>View current inventory levels for your branch.</p>
+          <ul class="sub-features">
+            <li>Product list with SOH, beginning stock</li>
+            <li>Search and filter capabilities</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Inventory</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Transfers</h3>
+          <div class="path">/manager/transfers</div>
+          <p>Request stock transfers from warehouse or other branches.</p>
+          <ul class="sub-features">
+            <li>New Transfer Request form (select product, quantity, destination)</li>
+            <li>View transfer history and status</li>
+          </ul>
+          <div class="tags"><span class="tag tag-amber">Request</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Trends</h3>
+          <div class="path">/manager/trends</div>
+          <p>Sell-thru trend charts for your branch with trajectory indicators.</p>
+          <ul class="sub-features">
+            <li>Sell-thru trend chart over time</li>
+            <li>Category comparison</li>
+            <li>Declining products table</li>
+          </ul>
+          <div class="tags"><span class="tag tag-amber">Charts</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Replenishment</h3>
+          <div class="path">/replenishment</div>
+          <p>View restock suggestions and confirm with one tap.</p>
+          <ul class="sub-features">
+            <li>System-generated restock suggestions</li>
+            <li>One-tap confirm to accept suggestion</li>
+            <li>Based on SOH thresholds and sell-thru velocity</li>
+          </ul>
+          <div class="tags"><span class="tag tag-purple">Smart</span><span class="phase-badge phase-3">Phase 3</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Reports</h3>
+          <div class="path">/manager/reports</div>
+          <p>Sell-thru summary report for your branch with export.</p>
+          <ul class="sub-features">
+            <li>Branch-scoped sell-thru summary</li>
+            <li>Export to Excel &amp; PDF</li>
+          </ul>
+          <div class="tags"><span class="tag tag-green">Export</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BRANCH STAFF ==================== -->
+  <div id="role-staff" class="role-content">
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#dcfce7;color:#166534">&#128241;</span> Branch Staff Pages</div>
+      <p style="color:#64748b;font-size:0.85rem;margin-bottom:16px;">Mobile-optimized interface with bottom tab navigation. Designed for quick daily sales logging.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Sales Entry</h3>
+          <div class="path">/staff/sales-entry</div>
+          <p>Log daily product sales with fast mobile-friendly product search.</p>
+          <ul class="sub-features">
+            <li>Product search by style code or name</li>
+            <li>Quick entry form: select product, enter quantity</li>
+            <li>"X logged today" counter badge</li>
+            <li>Today's sales history list below the form</li>
+            <li>SOH updates automatically after each entry</li>
+          </ul>
+          <div class="tags"><span class="tag tag-green">Mobile</span><span class="tag tag-blue">Daily Task</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Stock Overview</h3>
+          <div class="path">/staff/stock-overview</div>
+          <p>Check current stock on hand for your branch.</p>
+          <ul class="sub-features">
+            <li>Product list with current SOH</li>
+            <li>Quick stock check for customer inquiries</li>
+          </ul>
+          <div class="tags"><span class="tag tag-blue">Read-only</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SYSTEM ==================== -->
+  <div id="role-system" class="role-content">
+    <div class="section">
+      <div class="section-title"><span class="icon" style="background:#f3e8ff;color:#6b21a8">&#9889;</span> Automated System Functions</div>
+      <p style="color:#64748b;font-size:0.85rem;margin-bottom:16px;">Background processes that run automatically without user intervention.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Slow Mover Alerts</h3>
+          <p>Scans all branch products every minute, detects slow movers, and creates notifications for Branch Managers.</p>
+          <div class="tags"><span class="tag tag-red">Every 1 min</span><span class="phase-badge phase-2">Phase 2</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Markdown Rule Evaluation</h3>
+          <p>Daily at 6 AM PHT: evaluates enabled markdown rules against all products and generates proposals for qualifying items.</p>
+          <div class="tags"><span class="tag tag-amber">Daily 6 AM</span><span class="phase-badge phase-4">Phase 4</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Weather Data Refresh</h3>
+          <p>Fetches weather data from OpenWeatherMap API every hour for all configured locations. Caches with 1-hour TTL.</p>
+          <div class="tags"><span class="tag tag-blue">Every 1 hr</span><span class="phase-badge phase-4">Phase 4</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Autonomous Pipeline</h3>
+          <p>Daily at 7 AM PHT: evaluates all pending suggestions against guardrails, auto-executes or flags for Admin review.</p>
+          <div class="tags"><span class="tag tag-purple">Daily 7 AM</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Autonomous Digest</h3>
+          <p>Daily at 8 AM PHT: compiles summary of all autonomous actions into an Admin notification.</p>
+          <div class="tags"><span class="tag tag-purple">Daily 8 AM</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>POS Webhook</h3>
+          <p>HTTP endpoint receives POS transaction events in real-time, validates HMAC signature, deduplicates, and syncs SOH.</p>
+          <div class="tags"><span class="tag tag-green">Real-time</span><span class="phase-badge phase-5">Phase 5</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>ML Model Training</h3>
+          <p>Weekly on Sunday 2 AM PHT: trains ML forecasting model on 6 months of historical sell-thru data.</p>
+          <div class="tags"><span class="tag tag-purple">Weekly Sun</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Reorder Point Evaluation</h3>
+          <p>Daily at 6 AM PHT: checks all reorder rules, auto-generates POs when SOH falls below safety stock.</p>
+          <div class="tags"><span class="tag tag-amber">Daily 6 AM</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Loyalty Member Sync</h3>
+          <p>Every 4 hours: syncs member data from external loyalty platform API, computes preferred categories.</p>
+          <div class="tags"><span class="tag tag-blue">Every 4 hrs</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+
+        <div class="feature-card">
+          <h3>Exchange Rate Refresh</h3>
+          <p>Daily at 1 AM PHT: fetches latest currency exchange rates for all active regions.</p>
+          <div class="tags"><span class="tag tag-green">Daily 1 AM</span><span class="phase-badge phase-6">Phase 6</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Aero Inventory Monitoring System &mdash; Built for Aeropostale Philippines</p>
+    <p>6 Phases &bull; 29 Epics &bull; 87 Stories &bull; 3 Roles &bull; 40+ Pages</p>
+  </div>
+</div>
+
+<script>
+function showRole(role) {
+  document.querySelectorAll('.role-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.role-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('role-' + role).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
