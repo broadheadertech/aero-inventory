@@ -39,7 +39,7 @@ export default function AutonomousDashboardPage() {
   const reject = useMutation(api.mutations.resolveAutonomousAction.rejectAutonomousAction);
   const undo = useMutation(api.mutations.undoAutonomousAction.undoAutonomousAction);
 
-  const handleAction = async (fn: (args: { actionId: Id<"autonomousActions"> }) => Promise<void>, id: Id<"autonomousActions">, label: string) => {
+  const handleAction = async (fn: (args: { actionId: Id<"autonomousActions"> }) => Promise<unknown>, id: Id<"autonomousActions">, label: string) => {
     try {
       await fn({ actionId: id });
       toast({ title: label });
